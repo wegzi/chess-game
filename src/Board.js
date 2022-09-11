@@ -1,19 +1,28 @@
 import React from "react";
 import styled from "styled-components";
+import { pawnValidMoves } from "./moves";
 
-export default function Board({ matriz }) {
-  console.log(matriz);
+export default function Board({ matrix }) {
+  console.log(matrix);
   return (
     <div className="flex justify-center mt-5">
       <div>
-        <BoardContent ySize={matriz.length}>
+        <BoardContent ySize={matrix.length}>
           <BoardContainer>
-            {matriz.map((x, xIndex) => (
-              <BoardRow key={xIndex}>
-                {x.cols.map((y) => (
-                  <BoardCell dim={y.dim} key={y.key}>
-                    <CellKey>{y.key}</CellKey>
-                    <Pieace>{y.piece.name}</Pieace>
+            {matrix.map((yAxis, yIndex) => (
+              <BoardRow key={yIndex}>
+                {yAxis.cols.map((xAxis, xIndex) => (
+                  <BoardCell dim={!((xIndex + yIndex) % 2)} key={xAxis.key}>
+                    <CellKey>{xAxis.key}</CellKey>
+                    {xAxis.piece.name && (
+                      <Piece
+                        className="rounded-xl"
+                        piece={xAxis.piece}
+                        onClick={() => pawnValidMoves(matrix, xAxis)}
+                      >
+                        {xAxis.piece.name}
+                      </Piece>
+                    )}
                   </BoardCell>
                 ))}
               </BoardRow>
@@ -24,6 +33,7 @@ export default function Board({ matriz }) {
     </div>
   );
 }
+
 const BoardRow = styled.div`
   display: grid;
   grid-template-columns: repeat(8, minmax(0px, 1fr));
@@ -53,11 +63,11 @@ const CellKey = styled.div`
   left: 3px;
   top: 3px;
   line-height: 1;
-  font-size: 0.75em;
+  font-size: 0.6em;
   font-weight: 500;
   opacity: 0.5;
 `;
-const Pieace = styled.div`
+const Piece = styled.div`
   position: absolute;
   left: 50%;
   top: 50%;
@@ -65,4 +75,21 @@ const Pieace = styled.div`
   font-size: 0.75em;
   font-weight: 500;
   transform: translateX(-50%) translateY(-50%);
+  background: ${({ piece }) => PIECE_THEME[piece.type]};
+  color: ${({ piece }) => PIECE_LABEL_THEME[piece.type]};
+
+  width: 60%;
+  height: 60%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
+
+const PIECE_THEME = {
+  white: "#d5d5d5",
+  black: "#555555",
+};
+const PIECE_LABEL_THEME = {
+  white: "#555555",
+  black: "#d5d5d5",
+};
